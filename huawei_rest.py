@@ -4,7 +4,7 @@
 --------------------------------------------------------------------------------
     Type:           Python 2.x script
     Author:         Milan Toman (milan.v.toman@gmail.com)
-    Description:    Parse WWN -> host lists and construct brocade commands
+    Description:    Huawei Oceanstor API library and CLI
 
     TOOD:           
 
@@ -19,6 +19,7 @@ import sys
 import os
 import re
 import textwrap
+import getpass
 # getopt or argparse, not sure which to go by
 import argparse
 #import getopts
@@ -52,9 +53,11 @@ _DEBUG_FILE = _LOG_DIR + re.sub(u'./', '', sys.argv[0]) + u'.dbg'
 requests.packages.urllib3.disable_warnings() 
 
 # Huawei specific
+_HOST = ''
 _PORT = 8088
-_USER = u'p_tomanmi'
-_PASS = u'3 litry Kvasaru!'
+_USER = u''
+_PASS = u''
+# scope -> user scope: 0 - local user, 1 - LDAP / AD user
 _SCOPE = 1
 
 
@@ -166,6 +169,7 @@ arg_parser.add_argument('-p', '--password',
                         type = str,
                         help = password_help)
 args = arg_parser.parse_args()
+_HOST = args.ip
                    
 
 '''
@@ -438,65 +442,12 @@ class huaweiOceanstor(object):
             
 # Main
 if '__main__':
-    
-    oceanstor = huaweiOceanstor('av3x018p.it.internal', _PORT)
+    _USER = raw_input(u'Username:')
+    _PASS = getpass.getpass(u'Password:')
+    oceanstor = huaweiOceanstor(_HOST, _PORT)
     oceanstor.huAuth(_USER, _PASS, _SCOPE)
-    #system = {u'data': {u'HIGHWATERLEVEL': u'80', u'VASA_SUPPORT_PROFILE': u'FileSystemProfile,BlockDeviceProfile,CapabilityProfile', u'WRITETHROUGHSW': u'true', u'STORAGEPOOLFREECAPACITY': u'44733532672', u'PRODUCTVERSION': u'V300R002C10', u'STORAGEPOOLRAWCAPACITY': u'173193044642', u'wwn': u'21000c45badd137b', u'THINLUNSUSEDCAPACITY': u'-1', u'userFreeCapacity': u'53902540656', u'UNAVAILABLEDISKSCAPACITY': u'0', u'DOMAINNAME': u'', u'THINLUNSALLOCATECAPACITY': u'99573703168', u'THICKLUNSALLOCATECAPACITY': u'254432256', u'HEALTHSTATUS': u'1', u'LOCATION': u'B52 41.3.46', u'CACHEWRITEQUOTA': u'333', u'TOTALCAPACITY': u'188938276390', u'RUNNINGSTATUS': u'1', u'USEDCAPACITY': u'99831543296', u'STORAGEPOOLUSEDCAPACITY': u'99831543296', u'SECTORSIZE': u'512', u'THINLUNSMAXCAPACITY': u'222612684800', u'VASA_ALTERNATE_NAME': u'av3x018p', u'VASA_SUPPORT_BLOCK': u'FC,FCOE,ISCSI,Others', u'MEMBERDISKSCAPACITY': u'179769268406', u'ID': u'2102350BRY10FA000004', u'NAME': u'av3x018p', u'DESCRIPTION': u'', u'THICKLUNSUSEDCAPACITY': u'-1', u'LOWWATERLEVEL': u'20', u'HOTSPAREDISKSCAPACITY': u'0', u'STORAGEPOOLCAPACITY': u'144829317120', u'PRODUCTMODE': u'61', u'STORAGEPOOLHOSTSPARECAPACITY': u'12271577762', u'WRITETHROUGHTIME': u'192', u'VASA_SUPPORT_FILESYSTEM': u'NFS', u'TYPE': 201, u'patchVersion': u'SPC200 ', u'FREEDISKSCAPACITY': u'9169007984'}, u'error': {u'code': 0, u'description': u'0'}}
     printline()
     pool_count = oceanstor.huGet('/storagepool/count')
-    #user = {u'data': [{u'COUNT': u'0', u'ISONLINE': u'1', u'DESCRIPTION': u'', u'USERGROUPNAME': u'APUX.Storage.NetApp_Admin_P_AT', u'LEVEL': u'2', u'LOCKSTATUS': u'0', u'SCOPE': u'1', u'TYPE': 202, u'ID': u'p_tomanmi', u'NAME': u'p_tomanmi'}], u'error': {u'code': 0, u'description': u'0'}}
-    #printline()
-    '''
-    {u'DATASPACE': u'15233827840', 
-     u'IMMEDIATEMIGRATIONDURATIONTIME': u'0'
-     u'MOVEDDOWNDATA': u'0',
-     u'USERTOTALCAPACITY': u'72414658560',
-     u'TIER2CAPACITY': u'0',
-     u'TIER0DISKTYPE': u'3',
-     u'MOVEDUPDATA': u'0',
-     u'MOVEDOWNDATA': u'0',
-     u'PARENTID': u'0',
-     u'MOVEUPDATA': u'0',
-     u'DSTRUNNINGSTATUS': u'1',
-     u'USERCONSUMEDCAPACITY': u'56866257920',
-     u'TIER1STRIPEDEPTH': u'256',
-     u'MIGRATIONSCHEDULEID': u'[]',
-     u'USERFREECAPACITY': u'15238022144',
-     u'PAUSEMIGRATIONSWITCH': u'0',
-     u'PARENTNAME': u'DD_ENG0',
-     u'TIER2DISKTYPE': u'0',
-     u'TIER1RAIDDISKNUM': u'10',
-     u'HEALTHSTATUS': u'1',
-     u'DSTSTATUS': u'1',
-     u'USERCONSUMEDCAPACITYTHRESHOLD': u'88',
-     u'RUNNINGSTATUS': u'27',
-     u'TIER1CAPACITY': u'34665922560',
-     u'TIER0RAIDLV': u'2',
-     u'MIGRATIONESTIMATEDTIME': u'0',
-     u'TIER0RAIDDISKNUM': u'10',
-     u'ENABLESMARTCACHE': u'false',
-     u'USERCONSUMEDCAPACITYPERCENTAGE': u'78',
-     u'RESERVEDCAPACITY': u'0',
-     u'TIER1RAIDLV': u'2',
-     u'REPLICATIONCAPACITY': u'310378496',
-     u'MONITORSCHEDULEID': u'[]',
-     u'ENABLESSDBUFFER': u'false',
-     u'ID': u'0',
-     u'NAME': u'SP_ENG0',
-     u'EXTENTSIZE': u'4608',
-     u'DESCRIPTION': u'',
-     u'TIER1DISKTYPE': u'1',
-     u'TYPE': 216,
-     u'IMMEDIATEMIGRATION': u'0',
-     u'USAGETYPE': u'1', 
-     u'TIER0STRIPEDEPTH': u'256',
-     u'MIGRATIONMODE': u'2',
-     u'TIER0CAPACITY': u'37748736000',
-     u'TIER2RAIDDISKNUM': u'0',
-     u'TIER2RAIDLV': u'0',
-     u'TIER2STRIPEDEPTH': u'0'
-    }
-    '''
     for n in range(0, int(pool_count['data']['COUNT'])):
         pool = oceanstor.huGet('/storagepool/' + str(n))
         id = n
