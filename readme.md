@@ -1,4 +1,4 @@
-# Huawei REST API CLI interface (python library)
+# Huawei OceanStor REST API CLI interface (python library)
 The purpose of this library / CLI tool is to provide a simple API for objects on an OceanStor 6800 / 5500 V3.
 
 ## Integrated help
